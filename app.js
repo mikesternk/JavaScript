@@ -77,42 +77,42 @@ const LearnerSubmissions = [
     learner_id: 125,
     assignment_id: 1,
     submission: {
-    submitted_at: "2023-01-25",
-    score: 47,
+        submitted_at: "2023-01-25",
+        score: 47,
     },
 },
 {
     learner_id: 125,
     assignment_id: 2,
     submission: {
-    submitted_at: "2023-02-12",
-    score: 150,
+        submitted_at: "2023-02-12",
+        score: 150,
     },
 },
 {
     learner_id: 125,
     assignment_id: 3,
     submission: {
-    submitted_at: "2023-01-25",
-    score: 400,
+        submitted_at: "2023-01-25",
+        score: 400,
     },
 },
 {
     learner_id: 132,
     assignment_id: 1,
     submission: {
-    submitted_at: "2023-01-24",
-    score: 39,
+        submitted_at: "2023-01-24",
+        score: 39,
     },
 },
 {
     learner_id: 132,
     assignment_id: 2,
     submission: {
-    submitted_at: "2023-03-07",
-    score: 140,
+        submitted_at: "2023-03-07",
+        score: 140,
     },
-},
+}
 ];
 
 function getLearnerData(course, ag, submissions) {
@@ -150,13 +150,62 @@ console.log(result);
 
 // Function to calculate weighted average
 function average(grade, total) {
+    let gradeID, totalPoints;
+
     console.log(`This is the course info: ${total.course_id}`);
-    for (let i = 0; i < grade.length; i++) {
-        console.log(grade[i].submission.score)
+
+    // for (let i = 0; i < grade.length; i++) {
+    //     console.log(`Student ID: ${grade[i].learner_id}`)
+    //     console.log(`Assignment ID: ${grade[1].assignment_id}`)
+    //     console.log(grade[i].submission.score)
+    // }
+
+    // for (let j = 0; j < total.assignments.length; j++) {
+    //     gradeID = total.assignments[j].id;
+    //     console.log(`The assignment ID: ${gradeID}`);
+    //     totalPoints = total.assignments[j].points_possible;
+    //     console.log(`This is the total possible grade: ${totalPoints}`);
+    // }
+
+    // going through students grades
+    // for (let a = 0; a < grade.length; a++) {
+    //     if (grade[a].learner_id == 125) {
+    //         console.log(`Student ID: ${grade[a].learner_id}`)
+    //     }
+    // }
+
+// Function to group submissions by learner ID
+function groupSubmissionsByLearnerId(submissions, totalGrades) {
+    const groupedAssignments = {};
+    
+    submissions.forEach(({ learner_id, assignment_id, submission}) => {
+        if (!groupedAssignments[learner_id]) {
+            groupedAssignments[learner_id] = [];
+        }
+        
+        totalGrades.forEach(submission)
+        groupedAssignments[learner_id].push({ assignment_id, score: submission.score });
+    });
+    
+    return groupedAssignments;
+}
+
+let theAssignments = groupSubmissionsByLearnerId(LearnerSubmissions, AssignmentGroup);
+
+console.log(theAssignments)
+
+    // make sure the assignment ID is correct   
+    if (gradeID == totalPoints) {
+
     }
-    for (let j = 0; j < total.assignments.length; j++) {
-        console.log(`This is the assignment info: ${total.assignments[j].points_possible}`);
-    }
+
+    // need to compare the assignment ID with the submitted assignment from the student
+    // console.log(totalPoints);
+
+    // if ()
+    // if (total.assignments[0].id == 1) {
+    //     console.log(total.assignments[0].points_possible)
+    // }
 }
 
 average(LearnerSubmissions, AssignmentGroup);
