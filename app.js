@@ -163,10 +163,10 @@ function getLearnerData(course, ag, submissions) {
     LearnerSubmissions,
     AssignmentGroup
   );
-  console.log(theAssignments);
+  //   console.log(theAssignments);
 
   // function to extract the assignment information
-  function extractAssignmentInfo(assignmentGroup) {
+  const extractAssignmentInfo = (assignmentGroup) => {
     const extractedInfoArray = [];
 
     assignmentGroup.assignments.forEach((assignment) => {
@@ -175,8 +175,47 @@ function getLearnerData(course, ag, submissions) {
     });
 
     return extractedInfoArray;
+  };
+  const classAssignment = extractAssignmentInfo(AssignmentGroup);
+  //   console.log(classAssignment);
+
+  // Function to group data based on assignment_id = id
+  function groupTotalScoreWithSubmission(submision, grade) {
+    const groupedData = {};
+
+    // Iterate through each key in submision
+    for (const key in submision) {
+      // Iterate through each assignment in the grade
+      submision[key].forEach((assignment) => {
+        // Find the corresponding assignment in grade1 based on assignment_id = id
+        const correspondingAssignment = grade.find(
+          (a) => a.id === assignment.assignment_id
+        );
+
+        // If found, add points_possible to the submision
+        if (correspondingAssignment) {
+          // Create a new submision in groupedData if it doesn't exist
+          if (!groupedData[key]) {
+            groupedData[key] = [];
+          }
+
+          // Add points_possible to the submision
+          groupedData[key].push({
+            ...assignment,
+            points_possible: correspondingAssignment.points_possible,
+          });
+        }
+      });
+    }
+
+    return groupedData;
   }
-  console.log(extractAssignmentInfo(AssignmentGroup));
+  // calling the group function
+  const groupedData = groupTotalScoreWithSubmission(
+    theAssignments,
+    classAssignment
+  );
+  console.log(groupedData);
 
   return results;
 }
