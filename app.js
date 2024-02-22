@@ -154,11 +154,27 @@ function getLearnerData(course, ag, submissions) {
       groupedAssignments[learner_id].push({
         assignment_id,
         score: submission.score,
+        submitted_at: submission.submitted_at,
       });
     });
     return groupedAssignments;
   }
+  console.log(groupSubmissionsByLearnerId(LearnerSubmissions));
 
+  const learnerData = new Map();
+  for (let i = 0; i < submissions.length; i++) {
+    if (!learnerData.has(submissions[i].learner_id)) {
+      learnerData.set(submissions[i].learner_id, [
+        [submissions[i].assignment_id, submissions[i].submission.score],
+      ]);
+    }
+    learnerData
+      .get(submissions[i].learner_id)
+      .push([submissions[i].assignment_id, submissions[i].submission.score]);
+  }
+  console.log(learnerData);
+
+  // theAssignments is the extracted submission array
   let theAssignments = groupSubmissionsByLearnerId(
     LearnerSubmissions,
     AssignmentGroup
@@ -176,23 +192,25 @@ function getLearnerData(course, ag, submissions) {
 
     return extractedInfoArray;
   };
+
+  // classAssignment is the extracted assignment array
   const classAssignment = extractAssignmentInfo(AssignmentGroup);
-  //   console.log(classAssignment);
+  // console.log(classAssignment);
 
   // Function to group data based on assignment_id = id
-  function groupTotalScoreWithSubmission(submision, grade) {
+  function groupTotalScoreWithSubmission(submit, grade) {
     const groupedData = {};
 
-    // Iterate through each key in submision
-    for (const key in submision) {
+    // Iterate through each key in submit
+    for (const key in submit) {
       // Iterate through each assignment in the grade
-      submision[key].forEach((assignment) => {
+      submit[key].forEach((value) => {
         // Find the corresponding assignment in grade1 based on assignment_id = id
         const correspondingAssignment = grade.find(
-          (a) => a.id === assignment.assignment_id
+          (a) => a.id === value.assignment_id
         );
 
-        // If found, add points_possible to the submision
+        // If found, add points_possible to the submission
         if (correspondingAssignment) {
           // Create a new submision in groupedData if it doesn't exist
           if (!groupedData[key]) {
@@ -201,8 +219,9 @@ function getLearnerData(course, ag, submissions) {
 
           // Add points_possible to the submision
           groupedData[key].push({
-            ...assignment,
+            ...value,
             points_possible: correspondingAssignment.points_possible,
+            due_date: correspondingAssignment.due_at,
           });
         }
       });
@@ -216,6 +235,43 @@ function getLearnerData(course, ag, submissions) {
     classAssignment
   );
   console.log(groupedData);
+
+  // function to check for past due date
+  const checkAssignmentIfPastDue = (data) => {
+    const todayDate = new Date();
+
+    // function to check if date is past today
+    const isPastToday = (dateString) => new Date(dateString) > todayDate;
+
+    // function to check whether submission date is past due date
+    const isPastDue = (submittedAt, dueAt) =>
+      new Date(submittedAt) > new Date(dueAt);
+
+    // Iterate through each key in data
+    for (const key in data) {
+      // Filter the assignments based on due dates
+      data[key] = data[key].filter((data) => {
+        const { due_date, submitted_at } = data;
+
+        // Remove assignments where due_date is past today
+        if (isPastToday(due_date)) {
+          console.log(`Assignment ${data.assignment_id} is not due yet!`);
+          return false;
+        }
+
+        // If late subtract 10 percent from assignment
+        if (isPastDue(submitted_at, due_date)) {
+          data.score -= 10;
+        }
+
+        return true;
+      });
+    }
+
+    return data;
+  };
+
+  console.log(checkAssignmentIfPastDue(groupedData));
 
   return results;
 }
